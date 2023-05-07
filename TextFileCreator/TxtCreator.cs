@@ -1,46 +1,41 @@
-﻿namespace TextFileCreator
+﻿using System.Text;
+
+namespace TextFileCreator
 {
     public class TxtCreator : IFilesFactory
     {
         private TxtCreator() { }
+
+        private readonly static string currentDirectory = ProjectSettings.TaskDirectory + "\\txt\\";
+        
         public static IFilesFactory GetCreator() => new TxtCreator();
 
         public void CreateFiles()
         {
-            CreateAndClearDirectory();
+            DirectoryManager.CreateAndClearDirectory(currentDirectory);
 
             for (int i = 0; i < ProjectSettings.NumberOfFiles; i++)
             {
-                TxtHelper.CreateFile(i);
+                CreateFile(i);
             }
         }
 
-        private static void CreateAndClearDirectory()
+        public void CreateFile(int fileNum)
         {
-            string path = $"{ProjectSettings.TaskDirectory}\\txt";
             try
             {
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
+                string path = $"{currentDirectory}{fileNum}.txt";
+                StreamWriter streamWriter = new StreamWriter(path, false, Encoding.UTF8);
+                streamWriter.WriteLine(RussianWordsDictionary.TakeWords());
 
-                DirectoryInfo directoryInfo = new DirectoryInfo(path);
-                FileInfo [] files = directoryInfo.GetFiles();
-                if (files.Length != 0)
-                {
-                    foreach (FileInfo file in files)
-                    {
-                        file.Delete();
-                    }
-                }
+                streamWriter.Close();
             }
             catch (Exception e)
             {
-
                 Console.WriteLine($"Ошибка -> ${e.Message}");
                 throw;
             }
         }
+
     }
 }

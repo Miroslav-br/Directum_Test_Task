@@ -6,43 +6,36 @@ namespace TextFileCreator
     {
         private DocxCreator() { }
 
+        private readonly static string currentDirectory = ProjectSettings.TaskDirectory + "\\docx\\";
+
         public static IFilesFactory GetCreator() => new DocxCreator();
 
         public void CreateFiles()
         {
-            CreateAndClearDirectory();
+            DirectoryManager.CreateAndClearDirectory(currentDirectory);
 
             Word.Application wordApp = new Word.Application();
             for (int i = 0; i < ProjectSettings.NumberOfFiles; i++)
             {
-                WordHelper.CreateFile(ref wordApp,i);
+                CreateFile(ref wordApp,i);
             }
             wordApp.Quit();
         }
 
-        private static void CreateAndClearDirectory()
+        public void CreateFile(ref Word.Application wordApp, int fileNum)
         {
-            string path = $"{ProjectSettings.TaskDirectory}\\docx";
             try
             {
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
+                Word.Document document = wordApp.Documents.Add();
+                Word.Paragraph paragraph;
+                paragraph = document.Paragraphs.Add();
+                paragraph.Range.Text = RussianWordsDictionary.TakeWords();
 
-                DirectoryInfo directoryInfo = new DirectoryInfo(path);
-                FileInfo[] files = directoryInfo.GetFiles();
-                if (files.Length != 0)
-                {
-                    foreach (FileInfo file in files)
-                    {
-                        file.Delete();
-                    }
-                }
+                document.SaveAs2($"{currentDirectory}{fileNum}.docx");
+                document.Close();
             }
             catch (Exception e)
             {
-
                 Console.WriteLine($"Ошибка -> ${e.Message}");
                 throw;
             }

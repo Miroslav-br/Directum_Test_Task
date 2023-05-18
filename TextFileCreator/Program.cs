@@ -11,7 +11,7 @@
         {
             Console.WriteLine("Напишите ниже формат файлов, который вы бы хотели создать (txt | docx)");
             string? inputvalue = Console.ReadLine()?.Trim().ToLower();
-            IFilesFactory factory = null;
+            IFilesFactory factory;
             switch (inputvalue)
             {
                 case nameof(FileExtensions.docx):
